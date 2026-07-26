@@ -1,10 +1,12 @@
 # 💪 FitCoach AI — RAG Fitness & Nutrition Assistant
 
-Final project for the [LLM Zoomcamp](https://github.com/DataTalksClub/llm-zoomcamp) (DataTalks.Club).
+Project Purpose:
 
 > A conversational assistant that answers questions about training, nutrition,
 > recovery, and injury prevention, using a fully local RAG (Retrieval-Augmented
 > Generation) architecture built with Ollama and Qdrant.
+
+> **Note**: This project was developed with AI assistance.
 
 ---
 
