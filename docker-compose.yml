@@ -1,0 +1,95 @@
+version: "3.9"
+
+services:
+  # OPTIONAL: containerized Ollama. On macOS, Docker containers cannot access
+  # the Metal GPU, so Ollama running here is much slower than running it
+  # natively on the host. It's recommended to install Ollama directly on
+  # macOS (https://ollama.com/download) and skip this service entirely.
+  # This service only starts if you run `make up-with-ollama` (profile
+  # "with-ollama"). Useful on Linux hosts with GPU passthrough, or if you
+  # simply don't want to install Ollama on the host.
+  ollama:
+    image: ollama/ollama:latest
+    container_name: fitcoach-ollama
+    profiles: ["with-ollama"]
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: fitcoach-qdrant
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+  postgres:
+    image: postgres:16
+    container_name: fitcoach-postgres
+    environment:
+      POSTGRES_USER: fitcoach
+      POSTGRES_PASSWORD: fitcoach
+      POSTGRES_DB: fitcoach
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fitcoach"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: fitcoach-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+    volumes:
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - postgres
+
+  app:
+    build: .
+    container_name: fitcoach-app
+    ports:
+      - "8501:8501"
+    environment:
+      # Defaults to the host's native Ollama (recommended on macOS for Metal
+      # GPU acceleration). If you use `make up-with-ollama` instead, override
+      # this to http://ollama:11434 (see .env.example).
+      OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3.2}
+      OLLAMA_EMBED_MODEL: ${OLLAMA_EMBED_MODEL:-nomic-embed-text}
+      QDRANT_URL: http://qdrant:6333
+      QDRANT_COLLECTION: fitcoach_knowledge
+      DATABASE_URL: postgresql://fitcoach:fitcoach@postgres:5432/fitcoach
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # needed for Linux; harmless on macOS/Windows
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - qdrant
+      - postgres
+
+volumes:
+  ollama_data:
+  qdrant_data:
+  postgres_data:
+  grafana_data:

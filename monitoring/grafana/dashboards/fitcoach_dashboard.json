@@ -1,0 +1,54 @@
+{
+  "apiVersion": 1,
+  "title": "FitCoach AI - Monitoring",
+  "uid": "fitcoach-monitoring",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "30s",
+  "time": { "from": "now-7d", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Total conversations",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "PE7AC3E30A56FEE85" },
+          "format": "table",
+          "rawSql": "SELECT COUNT(question) FROM conversations LIMIT 50"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Average latency (s)",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "PE7AC3E30A56FEE85" },
+          "format": "table",
+          "rawSql": "SELECT round(avg(latency_seconds)::numeric, 2) FROM conversations WHERE created_at > now() - interval '7 days' LIMIT 50"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "table",
+      "title": "Recent conversations",
+      "gridPos": { "h": 12, "w": 24, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "refId": "A",
+          "datasource": { "type": "grafana-postgresql-datasource", "uid": "PE7AC3E30A56FEE85" },
+          "format": "table",
+          "rawSql": "SELECT created_at, question, answer FROM conversations ORDER BY created_at DESC LIMIT 50"
+        }
+      ]
+    }
+  ]
+}

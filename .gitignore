@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.env
+data/bm25_index.pkl
+.venv/
+*.pkl
+.DS_Store
+.venv/

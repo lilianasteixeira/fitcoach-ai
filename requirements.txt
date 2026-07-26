@@ -1,0 +1,6 @@
+streamlit==1.38.0
+requests==2.32.3
+qdrant-client==1.11.1
+rank-bm25==0.2.2
+psycopg[binary]==3.2.10
+pandas==2.2.2

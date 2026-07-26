@@ -1,0 +1,18 @@
+apiVersion: 1
+
+datasources:
+  - name: Postgres-FitCoach
+    type: grafana-postgresql-datasource
+    access: proxy
+    url: postgres:5432
+    database: fitcoach
+    user: fitcoach
+    isDefault: true
+    editable: true
+    secureJsonData:
+      password: fitcoach
+    jsonData:
+      database: fitcoach
+      sslmode: disable
+      postgresVersion: 1600
+      timescaledb: false
