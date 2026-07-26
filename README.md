@@ -211,7 +211,16 @@ a discrete GPU. If you see `Read timed out` errors:
 4. Use 👍/👎 to give feedback — this feeds the monitoring dashboard
 5. In the sidebar you can switch the retrieval strategy (`vector`, `text`, `hybrid`) and the prompt template (`concise`, `detailed`)
 
-*(App and Grafana dashboard screenshots: add here after the first run — see the `assets/` folder.)*
+### Screenshots
+
+**Streamlit App Interface:**
+![FitCoach App](assets/app.png)
+
+**LLM Response with Sources:**
+![LLM Response](assets/llm_response.png)
+
+**Grafana Monitoring Dashboard:**
+![Grafana Dashboard](assets/grafana_dashboard.png)
 
 ## Evaluation
 
